@@ -1,6 +1,7 @@
 import React from "react";
 import "../styles/app.css";
 import axios from "axios"
+import CurrentWeather from "./currentWeather"
 
 function weather(props){
     let cities = {
@@ -11,22 +12,41 @@ function weather(props){
         "Нью-Йорк": {lat: 40.741895, lon: -73.989308},
         Минск: {lat: 53.9024716, lon: 27.5618225}
     }
-    //console.log(Object.keys(cities)) 
-    // 273.15
-    let [currentweather, setCurrentWeather] = React.useState(0)
-    if (currentweather===0) setCurrentWeather("Сургут")
-    function changeSelect(e){
-        let lat = cities[e.target.value]["lat"]
-        let lon = cities[e.target.value]["lon"]
-        console.log(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=ca41b2393b99c2028ee6b134000ddab8`)
-        axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=ca41b2393b99c2028ee6b134000ddab8`)
+    
+    let [currentweather, setCurrentWeather] = React.useState(new Object());
+    let [spinner, setSpinner] = React.useState(true); 
+    
+    function degToCompass(num){
+        let arr=["С","СВ","В", "ЮВ","Ю","ЮЗ","З","СЗ"]
+        return arr[Math.floor(num/45)+Math.floor(num%45/22.5)]
+    }
+
+    async function getWeatherCity(city){
+        let lat = cities[city]["lat"]
+        let lon = cities[city]["lon"]
+        await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=ca41b2393b99c2028ee6b134000ddab8`)
             .then(resp=>{console.log(resp.data)
                 let dict = {
-                    temp: resp.data["main"]["temp"]-273.15
+                    temp: Math.round(resp.data["main"]["temp"]-273.15)+" °C",
+                    windspeed: Math.round(resp.data["wind"]["speed"]),
+                    winddirection: degToCompass(resp.data["wind"]["deg"]),
+                    pressure: Math.round(resp.data["main"]["pressure"] * 0.750062),
+                    humidity: resp.data["main"]["humidity"],
+                    clouds: resp.data["clouds"]["all"]
                 }
                 setCurrentWeather(dict)
-            }) 
-        
+            })
+        const sleep = ms => new Promise(r => setTimeout(r, ms));
+        await sleep(300)
+        setSpinner(false)
+    }
+    async function changeSelect(e){
+        setSpinner(true)
+        let city = e.target.value
+        await getWeatherCity(city)
+    }
+    if (!Object.keys(currentweather).length){ 
+        getWeatherCity("Сургут") 
     }
     return(
         <>
@@ -36,7 +56,9 @@ function weather(props){
                 return (<option key={el} value={el}>{el}</option>)
             })}
         </select>
-        <p>Текущая температура: {currentweather["temp"]}</p>
+        {spinner? 
+            (<p>Загрузка...</p>): 
+            (<CurrentWeather weather={currentweather}/>)}
         </>
     )
 }

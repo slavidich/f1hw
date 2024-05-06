@@ -1,6 +1,5 @@
 import React from "react";
 import "../styles/app.css";
-import CurrentWeather from "./currentWeather"
 import Weather from "./weather"
 //https://api.openweathermap.org/data/2.5/weather?lat=61.15&lon=73.26&appid=ca41b2393b99c2028ee6b134000ddab8
 //http://api.openweathermap.org/data/2.5/forecast?lat=61.15&lon=73.26&appid=ca41b2393b99c2028ee6b134000ddab8
