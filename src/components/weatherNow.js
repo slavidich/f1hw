@@ -6,7 +6,7 @@ function weatherNow(props){
 
     return(
         <div>
-            
+            <p>Текущее время: </p>
             <p>Текущая температура: {props.dict["temp"]}</p>
             <p>Ветер: {props.dict["windspeed"]} м/c {(props.dict["winddirection"])}</p>
             <p>Давление: {props.dict["pressure"]} мм рт.ст.</p>

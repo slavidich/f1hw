@@ -18,7 +18,10 @@ function App() {
         "Санкт-Петербург": {lat: 59.938480, lon: 30.312480},
         Владивосток: {lat: 43.115761, lon: 131.885483},
         "Нью-Йорк": {lat: 40.741895, lon: -73.989308},
-        Минск: {lat: 53.9024716, lon: 27.5618225}
+        Минск: {lat: 53.9024716, lon: 27.5618225},
+        Аделаида: {lat:-34.92, lon:138.59},
+        Мидуэй: {lat:28.205, lon:-177.376},
+        Хобарт: {lat:-42.8839, lon:147.324}
     }
 
     let [city, setCity] = React.useState(Object.keys(cities)[0])
@@ -34,7 +37,7 @@ function App() {
                 return (<option key={el} value={el}>{el}</option>)
             })}
         </select>
-        <Weather key={city} coord={cities[city]}/>
+        <Weather key={city} coord={cities[city]} />
         </>
     )
 }
