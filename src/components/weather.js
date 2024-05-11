@@ -1,15 +1,15 @@
 import React from "react";
-import "../styles/app.css";
+import "../styles/weather.css";
 import axios from "axios"
-import WeatherNow from "./weatherNow"
+import WeatherDay from "./weatherDay"
 import moment from 'moment-timezone'
-
-
 
 function weather(props){
     
     let [isLoading, setLoading] = React.useState(true)
     let [dict, setDict] = React.useState(new Object)
+    let [days5, setDays5] = React.useState(new Object)
+    let [nowdayincity, setNowdayincity] = React.useState(0)
 
     function degToCompass(num){
         let arr=["С","СВ","В", "ЮВ","Ю","ЮЗ","З","СЗ"]
@@ -56,20 +56,39 @@ function weather(props){
                 humidity: respweather.data["main"]["humidity"],
                 clouds: respweather.data["clouds"]["all"]
             }
-            let dtz = 0
-            let forecast = respforecast.data['list'].map((el)=>{
-                dtz = respforecast.data["city"]["timezone"]/3600
+            
+            let dtz = respforecast.data["city"]["timezone"]/3600
+            nowdayincity = moment.utc(new Date(resptime.data['datetime'])).utcOffset(convertOffset(dtz))
+            days5[nowdayincity.date()] = {"Сегодня": nowweather}
+            let forecastkey=0
+            moment.locale('ru')
+            respforecast.data['list'].map((el)=>{
                 let datestr = (el["dt_txt"].replace(" ","T")+"Z")// время UTC )
                 let datetime =  moment.utc(new Date(datestr)).utcOffset(convertOffset(dtz))
-                return datetime 
+                let prognoz = {
+                    temp: Math.round(el["main"]["temp"]-273.15)+" °C",
+                    windspeed: Math.round(el["wind"]["speed"]),
+                    winddirection: degToCompass(el["wind"]["deg"]),
+                    pressure: Math.round(el["main"]["pressure"]* 0.750062),
+                    humidity: el["main"]["humidity"],
+                    clouds: el["clouds"]["all"],
+                    forecastkey: forecastkey
+                }
+                if (datetime.date() in days5){
+                    
+                    days5[datetime.date()][datetime.hours()] = prognoz
+                }
+                else{
+                    days5[datetime.date()] = {[datetime.hours()]: prognoz}
+                } 
+                forecastkey+=1
+                return datetime
             })
-            let nowdayincity = moment.utc(new Date(resptime.data['datetime'])).utcOffset(convertOffset(dtz)).date()
-            let days5 = new Object()
-            forecast.forEach((el)=>{
-                (el.date() in days5)?days5[el.date()].push(el): days5[el.date()] = new Array(el)
-            })
+            nowdayincity = moment.utc(new Date(resptime.data['datetime'])).utcOffset(convertOffset(dtz))
+            console.log(nowdayincity)
+            setNowdayincity(nowdayincity)
             console.log(days5)
-            console.log(forecast)
+            console.log(Object.keys(days5).toString())
             setDict({now: nowweather})
             setLoading(false)
         })
@@ -79,7 +98,10 @@ function weather(props){
     }
     return(
         <>
-            <WeatherNow dict={dict["now"]}></WeatherNow>
+            <p>Разница относительно UTC: {convertOffset(nowdayincity.utcOffset()/60)}</p>
+            {(Object.keys(days5).map(dayel=>{
+                return(<WeatherDay key={dayel} day={dayel} data={days5[dayel]} firstdate={(nowdayincity.date()==dayel)}></WeatherDay>)
+            }))}
         </>
     )
 }
