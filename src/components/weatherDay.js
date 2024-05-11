@@ -9,12 +9,12 @@ function weatherNow(props){
     return(
         <div className="datediv">
             <p>{props.firstdate? "Сегодня ("+props.day+")": props.day}</p>
-            <p>{("Сегодня" in props.data).toString()}</p>
+            <p></p>
             {(Object.keys(props.data)).map(el=>{
                 
                 return (
                     <div>
-                        <p>На {el.toString()}:00</p>
+                        <p>{props.firstdate && (el==0)?"Сейчас":`На ${el.toString()}:00`}</p>
                         <p>Температура: {props.data[el]["temp"]}</p>
                         <p>Ветер : {props.data[el]["windspeed"]}м/c {(props.data[el]["winddirection"])}</p>
                         <p>Давление: {props.data[el]["pressure"]} рт.ст.</p>

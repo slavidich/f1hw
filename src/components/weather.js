@@ -3,6 +3,7 @@ import "../styles/weather.css";
 import axios from "axios"
 import WeatherDay from "./weatherDay"
 import moment from 'moment-timezone'
+moment.locale('ru')
 
 function weather(props){
     
@@ -59,9 +60,10 @@ function weather(props){
             
             let dtz = respforecast.data["city"]["timezone"]/3600
             nowdayincity = moment.utc(new Date(resptime.data['datetime'])).utcOffset(convertOffset(dtz))
-            days5[nowdayincity.date()] = {"Сегодня": nowweather}
+            console.log(nowdayincity)
+            days5[nowdayincity.date()] = {0: nowweather}
             let forecastkey=0
-            moment.locale('ru')
+            
             respforecast.data['list'].map((el)=>{
                 let datestr = (el["dt_txt"].replace(" ","T")+"Z")// время UTC )
                 let datetime =  moment.utc(new Date(datestr)).utcOffset(convertOffset(dtz))
@@ -72,10 +74,10 @@ function weather(props){
                     pressure: Math.round(el["main"]["pressure"]* 0.750062),
                     humidity: el["main"]["humidity"],
                     clouds: el["clouds"]["all"],
-                    forecastkey: forecastkey
+                    forecastkey: forecastkey,
+                    datetime: datetime
                 }
                 if (datetime.date() in days5){
-                    
                     days5[datetime.date()][datetime.hours()] = prognoz
                 }
                 else{
@@ -84,6 +86,7 @@ function weather(props){
                 forecastkey+=1
                 return datetime
             })
+            moment.locale = ('ru')
             nowdayincity = moment.utc(new Date(resptime.data['datetime'])).utcOffset(convertOffset(dtz))
             console.log(nowdayincity)
             setNowdayincity(nowdayincity)
@@ -98,9 +101,9 @@ function weather(props){
     }
     return(
         <>
-            <p>Разница относительно UTC: {convertOffset(nowdayincity.utcOffset()/60)}</p>
+            <p>Текущее время: {nowdayincity.date()+"/" + nowdayincity.month()+"/"+nowdayincity.year()+" "+nowdayincity.hours()+":"+nowdayincity.minutes()+" UTC"+convertOffset(nowdayincity.utcOffset()/60)}</p>
             {(Object.keys(days5).map(dayel=>{
-                return(<WeatherDay key={dayel} day={dayel} data={days5[dayel]} firstdate={(nowdayincity.date()==dayel)}></WeatherDay>)
+                return(<WeatherDay key={dayel} day={dayel} data={days5[dayel]} firstdate={(nowdayincity.date()==dayel) }></WeatherDay>)
             }))}
         </>
     )
