@@ -1,3 +1,13 @@
 .datediv{
-    display:flex;
+    width: 100%;
+    max-width: 1200px;
+}
+.date{
+    font-size: 25px;
+    text-align: center;
+}
+.tableweather{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, 140px);
+    grid-template-rows: auto;
 }

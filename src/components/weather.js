@@ -49,18 +49,20 @@ function weather(props){
     React.useEffect(()=>{
         Promise.all([getCurrentWeather(), getForecast(), getCurrentTime()])
         .then(([respweather, respforecast, resptime])=>{
+            let dtz = respforecast.data["city"]["timezone"]/3600
             let nowweather = {
                 temp: Math.round(respweather.data["main"]["temp"]-273.15)+" °C",
                 windspeed: Math.round(respweather.data["wind"]["speed"]),
                 winddirection: degToCompass(respweather.data["wind"]["deg"]),
                 pressure: Math.round(respweather.data["main"]["pressure"] * 0.750062),
                 humidity: respweather.data["main"]["humidity"],
-                clouds: respweather.data["clouds"]["all"]
+                clouds: respweather.data["clouds"]["all"],
+                datetime: nowdayincity = moment.utc(new Date(resptime.data['datetime'])).utcOffset(convertOffset(dtz))
             }
             
-            let dtz = respforecast.data["city"]["timezone"]/3600
+            
             nowdayincity = moment.utc(new Date(resptime.data['datetime'])).utcOffset(convertOffset(dtz))
-            console.log(nowdayincity)
+
             days5[nowdayincity.date()] = {0: nowweather}
             let forecastkey=0
             
@@ -88,10 +90,7 @@ function weather(props){
             })
             moment.locale = ('ru')
             nowdayincity = moment.utc(new Date(resptime.data['datetime'])).utcOffset(convertOffset(dtz))
-            console.log(nowdayincity)
             setNowdayincity(nowdayincity)
-            console.log(days5)
-            console.log(Object.keys(days5).toString())
             setDict({now: nowweather})
             setLoading(false)
         })
@@ -101,9 +100,11 @@ function weather(props){
     }
     return(
         <>
+            <div className="selectdiv">
             <p>Текущее время: {nowdayincity.date()+"/" + nowdayincity.month()+"/"+nowdayincity.year()+" "+nowdayincity.hours()+":"+nowdayincity.minutes()+" UTC"+convertOffset(nowdayincity.utcOffset()/60)}</p>
+            </div>
             {(Object.keys(days5).map(dayel=>{
-                return(<WeatherDay key={dayel} day={dayel} data={days5[dayel]} firstdate={(nowdayincity.date()==dayel) }></WeatherDay>)
+                return(<WeatherDay key={dayel} day={dayel} data={days5[dayel]} firstdate={(nowdayincity.date()==dayel)}></WeatherDay>)
             }))}
         </>
     )

@@ -30,15 +30,19 @@ function App() {
         setCity(city)
     }
     return(
-        <>
-        <p>Выберите город:</p>
-        <select onChange={changeSelect}>
-            {Object.keys(cities).map(el=>{
-                return (<option key={el} value={el}>{el}</option>)
-            })}
-        </select>
-        <Weather key={city} coord={cities[city]} />
-        </>
+        <div className="main">
+            <div className="maindiv">
+                <div className="selectdiv">
+                <p>Выберите город:</p>
+                    <select onChange={changeSelect}>
+                        {Object.keys(cities).map(el=>{
+                            return (<option key={el} value={el}>{el}</option>)
+                        })}
+                    </select>
+                </div>
+            <Weather key={city} coord={cities[city]} />
+        </div>
+        </div>
     )
 }
 

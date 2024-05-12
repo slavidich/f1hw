@@ -1,8 +1,18 @@
-div{
-    padding:10px;
-
+.main{
+    width:100%;
+    display:flex;
+    flex-direction: row;
+    justify-content: center;
 }
-h1{
-    text-align: center;
-    color: rgb(0, 0, 0);
+.maindiv{
+    width:1120px;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+}
+.selectdiv{
+    font-size: 20px;
+}
+.selectdiv select{
+    font-size: 18px;
 }
